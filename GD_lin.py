@@ -1,41 +1,67 @@
 import numpy as np
-import matplotlib.pyplot as pt
-import math  as mt
 
-#Random
-#x = sorted(np.random.randint(low=1,high=50, size=(10)),key=int)
-x = np.array([11,12,13,14,15,16,17,18,19,20])
-y = np.random.randint(low=101,high=200, size=(len(x)))
-#y = np.array([111,112,123,144,175,156,197,218,219,220])
+def eq(x, b0, b1):
+    #Define the equation
+    return b0+b1*x
 
-b0=0
-b1=0
-ygd = np.zeros(shape=(len(y)),dtype=np.int32)
+def calculate_error(b0,b1,data):
+    #Initialize error
+    SSE = 0
+    for i in range(0,len(data),1):
+        x = data[i,0] #1st column in data is x
+        y = data[i,1] #2nd column in data is y
+        SSE += (y - eq(x,b0,b1))**2
+    #Calculate MSE from SSE
+    MSE = SSE/float(len(data))
+    return MSE
 
-
-def compute_error():
-    error = np.zeros(shape=(len(y)),dtype=np.int32)
+def step_gradient(b0_current, b1_current, data, learning_rate):
+    #initialize derivatives
+    b0_deriv=0
+    b1_deriv=0
+    #Number of data points
+    N = float(len(data))
     
+    for i in range(0,len(data),1):
+        x = data[i,0] #1st column in data is x
+        y = data[i,1] #2nd column in data is y
+        b0_deriv += -(2/N) * (y - ((b1_current * x) + b0_current))
+        b1_deriv += -(2/N) * x * (y - ((b1_current * x) + b0_current))
+        
+    b0_new = b0_current - (learning_rate * b0_deriv)
+    b1_new = b1_current - (learning_rate * b1_deriv)
+        
+    return b0_new,b1_new
+
+def gradient_descent_runner(data, b0_start, b1_start, learning_rate, iter):    
+    #Initialize weights
+    b0 = b0_start
+    b1 = b1_start
+    #Run step gradient iteratively to update weights
+    for i in range(iter):
+        b0, b1 = step_gradient(b0, b1, np.array(data), learning_rate)     
+    #Send weights to run function    
+    return b0, b1
    
-for i in range(0,len(x),1): #start(i) = 0, end(i) = len(x), interval = 1
+def run():    
+    #import data
+    data = np.genfromtxt('data-GD_lin_Siraj.csv', delimiter=',')
+    #hyperparameters
+    learning_rate = 0.0001
+    b0_ini = 0
+    b1_ini = 0
+    iter = 10000
+    #Print start
+    print ('Starting gradient descent at b0 = {0}, b1 = {1}, MSE = {2}'.format(b0_ini, b1_ini, calculate_error(b0_ini, b1_ini, data)))
+    print('Running....')
+    #Run GD function
+    b0, b1 = gradient_descent_runner(data, b0_ini, b1_ini, learning_rate, iter)
+    #Print results
+    print('After {0} iterations b0 = {1}, b1 = {2}, MSE = {3}'.format(iter, b0, b1, calculate_error(b0, b1, data)))
+
+if __name__ == '__main__':
+    run()
     
-    ygd[i] = b0 + b1*x[i] 
-    error[i] = y[i] - ygd[i]
-    b0= b0 + 
-    b1= b1 + 
-    print('Iteration:', i, str(', ygd')  , ygd, str(', error=')  , error)
 
-
-
-
-
-
-# y = mx + b
-# m is slope, b is y-intercept
-def compute_error_for_line_given_points(b, m, points):
-    totalError = 0
-    for i in range(0, len(points)):
-        x = points[i, 0]
-        y = points[i, 1]
-        totalError += (y - (m * x + b)) ** 2
-    return totalError / float(len(points))
+    
+    
