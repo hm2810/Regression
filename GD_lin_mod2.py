@@ -7,8 +7,8 @@ learning_rate = 0.0001
 iter = 1000
 
 # =============================================================================
-# Loss function is Error**2, which is y_actual-y_predicted
-#  Now for gradient descent, we need to find derivative of Loss function wrt b0 and b1
+# Cost function is Error**2, which is y_actual-y_predicted
+#  Now for gradient descent, we need to find derivative of cost function wrt b0 and b1
 # For b0, from chain rule:
 #  d(Error**2)/d(b0) = d(Error**2)/d(Error) * d(Error)/d(b0)
 #  = 2 * Error * d(Error)/d(b0)
@@ -18,9 +18,9 @@ iter = 1000
 # Similarly, for b1, d(Error**2)/d(b1) = 2 * (y_actual - b0+b1*x) * (0 - 0 - x)
 #  = -2 * (y_actual - y_predicted) * x
 # Now, the b1 will be changed as, b1_new = b1_old - (deriv_b1 * learning rate)
-# Note that we are subtracting the derivative because derivative is negative,
-# however, if we have defined error as (y_predicted - y_actual) then derivative
-# would have been +ve so we had to add the derivative in above eq. instead of subtracting. 
+# Note that we are subtracting the derivative. This is because when derivative is negative,
+# then new weights will need to increase than previous value, and when derivative is positive,
+# weights will decrease compared to the previous value 
 # 
 # =============================================================================
 
@@ -39,9 +39,6 @@ def calculate_error(b0,b1,data):
     #Calculate MSE from SSE
     MSE = SSE/float(len(data))
     return MSE
-
-
-
 
 def GDrun():    
     #weights initialize
@@ -90,7 +87,7 @@ def plot():
     SST_yfit = SSE_yfit + SSR_yfit 
     Rsq_yfit = SSR_yfit/SST_yfit  
     RMSE_yfit = mt.sqrt(SSE_yfit/len(yfit))
-    print('R2_yfit= ',Rsq_yfit,'RMSE_yfit= ',RMSE_yfit)
+    print('R2_yfit= %f, Rsq_yfit= %f' % (Rsq_yfit, RMSE_yfit))
  
 if __name__ == '__main__':
     GDrun()
